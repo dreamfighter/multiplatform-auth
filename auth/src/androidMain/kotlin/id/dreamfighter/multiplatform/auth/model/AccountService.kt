@@ -8,10 +8,6 @@ data class AccountService(
     val type: String,
     @SerialName("project_id")
     val projectId: String,
-    @SerialName("private_key_id")
-    val privateKeyId: String,
-    @SerialName("private_key")
-    val privateKey: String,
     @SerialName("client_email")
     val clientEmail: String,
     @SerialName("client_id")

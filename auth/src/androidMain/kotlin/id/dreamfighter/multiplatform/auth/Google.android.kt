@@ -10,6 +10,7 @@ import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 import id.dreamfighter.multiplatform.auth.model.AccountService
+import id.dreamfighter.multiplatform.auth.model.GoogleUser
 import id.dreamfighter.multiplatform.auth.utils.FileUtil
 import id.dreamfighter.multiplatform.auth.utils.FileUtil.toObject
 import kotlinx.coroutines.MainScope
@@ -18,7 +19,7 @@ import java.util.UUID
 
 class GoogleAndroid : Google {
     val TAG = "GoogleAndroid"
-    override fun auth(code: (String) -> Unit,error: (Exception) -> Unit?) {
+    override fun auth(user: (GoogleUser) -> Unit, error: (Exception) -> Unit?) {
         val json = FileUtil.readFile("google-services.json")
         val accountService: AccountService = json.toObject<AccountService>()
         val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
@@ -42,7 +43,7 @@ class GoogleAndroid : Google {
                     request = request,
                     context = context,
                 )
-                handleSignIn(result,code)
+                handleSignIn(result,user)
             } catch (e: GetCredentialException) {
                 e.printStackTrace()
                 error(e)
@@ -51,7 +52,7 @@ class GoogleAndroid : Google {
         }
     }
 
-    private fun handleSignIn(result: GetCredentialResponse,code: (String) -> Unit) {
+    private fun handleSignIn(result: GetCredentialResponse,user: (GoogleUser) -> Unit) {
         // Handle the successfully returned credential.
         val credential = result.credential
 
@@ -63,7 +64,13 @@ class GoogleAndroid : Google {
                         // authenticate on your server.
                         val googleIdTokenCredential = GoogleIdTokenCredential
                             .createFrom(credential.data)
-                        code(googleIdTokenCredential.idToken)
+                        val googleUser = GoogleUser(
+                            idToken = googleIdTokenCredential.idToken,
+                            accessToken = googleIdTokenCredential.idToken,
+                            displayName = googleIdTokenCredential.displayName ?: "",
+                            profilePicUrl = googleIdTokenCredential.profilePictureUri?.toString()
+                        )
+                        user(googleUser)
                     } catch (e: GoogleIdTokenParsingException) {
                         Log.e(TAG, "Received an invalid google id token response", e)
                     }
@@ -80,4 +87,5 @@ class GoogleAndroid : Google {
         }
     }
 }
+
 actual val google: Google = GoogleAndroid()

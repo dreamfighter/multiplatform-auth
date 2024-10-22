@@ -6,6 +6,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinNativeCocoaPods)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.serializationPlugin)
@@ -14,9 +15,7 @@ plugins {
 }
 
 kotlin {
-    @OptIn(ExperimentalWasmDsl::class,
-        org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl::class
-    )
+    @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         moduleName = "multiplatform-auth"
         browser{
@@ -37,15 +36,23 @@ kotlin {
         }
     }
 
+    cocoapods {
+        ios.deploymentTarget = "11.0"
+        framework {
+            baseName = "MultiplatformAuthGoogle"
+            isStatic = true
+        }
+        pod("GoogleSignIn")
+    }
+
     iosX64()
     iosArm64()
     iosSimulatorArm64()
     linuxX64()
 
     sourceSets {
-        val androidMain by getting {
-            dependencies {
-            }
+        iosMain.dependencies {
+            //implementation(libs.github.mirzemehdi.google)
         }
         androidMain.dependencies {
             implementation(libs.androidx.startup.runtime)
@@ -54,6 +61,7 @@ kotlin {
             implementation(libs.google.identity.googleid)
             implementation(libs.kotlinx.coroutines.android)
             implementation(compose.components.resources)
+            //implementation(libs.github.mirzemehdi.google)
         }
         val commonMain by getting {
             dependencies {
@@ -69,11 +77,6 @@ kotlin {
             dependencies {
                 implementation(libs.kotlin.test)
                 implementation(libs.system.lambda)
-            }
-        }
-        val wasmJsMain by getting {
-            dependencies {
-
             }
         }
     }

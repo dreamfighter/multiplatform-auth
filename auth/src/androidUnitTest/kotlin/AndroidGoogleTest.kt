@@ -7,7 +7,7 @@ class AndroidGoogleTest {
 
     @Test
     fun `test google auth`() {
-        google.auth { _ -> }
+        google.auth( { _ -> })
         //assertEquals("IDR1,000.00", 1000.0.toCurrency("IDR"))
     }
 }
