@@ -1,7 +1,6 @@
 import kotlin.test.Test
-import kotlin.test.assertEquals
 
-class JvmFibiTest {
+class JvmGoogleTest {
 
     @Test
     fun `test 3rd element`() {
