@@ -10,6 +10,8 @@ data class AccountService(
     val projectId: String,
     @SerialName("client_email")
     val clientEmail: String,
+    @SerialName("client_secret")
+    val clientSecret: String,
     @SerialName("client_id")
     val clientId: String,
     @SerialName("auth_uri")
@@ -19,5 +21,7 @@ data class AccountService(
     @SerialName("auth_provider_x509_cert_url")
     val authProviderX509CertUrl: String,
     @SerialName("client_x509_cert_url")
-    val clientX509CertUrl: String
+    val clientX509CertUrl: String,
+    @SerialName("scopes")
+    val scopes: String
 )

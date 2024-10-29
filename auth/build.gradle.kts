@@ -54,6 +54,10 @@ kotlin {
         iosMain.dependencies {
             //implementation(libs.github.mirzemehdi.google)
         }
+
+        jvmMain.dependencies {
+            implementation(libs.ktor.server.netty)
+        }
         androidMain.dependencies {
             implementation(libs.androidx.startup.runtime)
             implementation(libs.androidx.credentials)
@@ -71,6 +75,9 @@ kotlin {
                 implementation(libs.androidx.lifecycle.viewmodel)
                 implementation(libs.androidx.lifecycle.runtime.compose)
                 implementation(libs.kotlinx.serialization.json)
+                implementation(libs.dreamfighter.multiplatform.api)
+                implementation(libs.dreamfighter.multiplatform.annotation)
+                implementation(libs.ktor.server.websockets)
             }
         }
         val commonTest by getting {
