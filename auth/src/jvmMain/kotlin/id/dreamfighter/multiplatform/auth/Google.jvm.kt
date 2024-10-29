@@ -6,12 +6,15 @@ import id.dreamfighter.multiplatform.auth.model.AccountService
 import id.dreamfighter.multiplatform.auth.model.GoogleUser
 import id.dreamfighter.multiplatform.auth.utils.FileUtil
 import id.dreamfighter.multiplatform.auth.utils.FileUtil.toObject
+import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.content.TextContent
 import io.ktor.server.application.install
 import io.ktor.server.engine.EmbeddedServer
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.server.netty.NettyApplicationEngine
-import io.ktor.server.response.respondText
+import io.ktor.server.response.respond
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
 import io.ktor.server.websocket.WebSockets
@@ -36,7 +39,8 @@ class GoogleJvm : Google {
                     println(call.parameters["code"])
                     call.parameters["code"]?.let { code(it) }
                     if (successHtml != null) {
-                        call.respondText(successHtml)
+                        val message = TextContent(successHtml, ContentType("text","html"), HttpStatusCode.OK)
+                        call.respond(message)
                     }
                     server?.run {
                         println("stopping server")
