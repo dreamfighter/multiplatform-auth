@@ -86,6 +86,10 @@ class GoogleAndroid : Google {
             }
         }
     }
+
+    override fun authCode(code: (String) -> Unit, error: (Exception) -> Unit?) {
+        TODO("Not yet implemented")
+    }
 }
 
 actual val google: Google = GoogleAndroid()

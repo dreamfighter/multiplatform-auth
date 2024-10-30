@@ -24,7 +24,9 @@ import io.ktor.websocket.Frame
 import io.ktor.websocket.close
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 
 class GoogleJvm : Google {
     private val mainScope = CoroutineScope(Dispatchers.Default)
@@ -64,10 +66,13 @@ class GoogleJvm : Google {
 
         server.start(wait = false)
         println("the server is stopped")
-
+        Runtime.getRuntime().addShutdownHook(Thread {
+            server.stop(1, 5, TimeUnit.SECONDS)
+        })
+        Thread.currentThread().join()
     }
 
-    override fun auth(user: (GoogleUser) -> Unit, error: (Exception) -> Unit?) {
+    override fun authCode(code: (String) -> Unit, error: (Exception) -> Unit?) {
         val json = FileUtil.readFile("/assets/google-services.json")
         println("json $json")
         json?.let {
@@ -104,24 +109,14 @@ class GoogleJvm : Google {
             rt.exec(arrayOf("sh", "-c", cmd.toString()))
 
             startServer {
-                val payload = mapOf(
-                    "code" to it,
-                    "client_id" to accountService.clientId,
-                    "client_secret" to accountService.clientSecret,
-                    "grant_type" to "authorization_code",
-                    "redirect_uri" to "http://localhost:9002/auth"
-                )
-
-                mainScope.launch{
-                    req<GoogleUser>(getGooleToken(payload))
-                }
+                code(it)
             }
         }
+    }
+
+    override fun auth(user: (GoogleUser) -> Unit, error: (Exception) -> Unit?) {
+        TODO("Not yet implemented")
     }
 }
 
 actual val google: Google = GoogleJvm()
-
-fun getGooleToken(payload:Map<String, String>): Request {
-    return Request(url = "https://oauth2.googleapis.com/token", method = "POST", path = mapOf(),query = mapOf(), body = payload, headers = mapOf("Content-Type" to "application/x-www-form-urlencoded"))
-}
