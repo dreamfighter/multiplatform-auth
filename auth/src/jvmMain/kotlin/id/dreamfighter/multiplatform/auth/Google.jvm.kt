@@ -1,7 +1,5 @@
 package id.dreamfighter.multiplatform.auth
 
-import id.dreamfighter.multiplatform.api.model.Request
-import id.dreamfighter.multiplatform.api.req
 import id.dreamfighter.multiplatform.auth.model.AccountService
 import id.dreamfighter.multiplatform.auth.model.GoogleUser
 import id.dreamfighter.multiplatform.auth.utils.FileUtil
@@ -24,12 +22,8 @@ import io.ktor.websocket.Frame
 import io.ktor.websocket.close
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
 
 class GoogleJvm : Google {
-    private val mainScope = CoroutineScope(Dispatchers.Default)
 
     private fun startServer(code:(String)-> Unit){
         var server: EmbeddedServer<NettyApplicationEngine,NettyApplicationEngine.Configuration>? = null
@@ -66,15 +60,11 @@ class GoogleJvm : Google {
 
         server.start(wait = false)
         println("the server is stopped")
-        Runtime.getRuntime().addShutdownHook(Thread {
-            server.stop(1, 5, TimeUnit.SECONDS)
-        })
-        Thread.currentThread().join()
     }
 
     override fun authCode(code: (String) -> Unit, error: (Exception) -> Unit?) {
         val json = FileUtil.readFile("/assets/google-services.json")
-        println("json $json")
+
         json?.let {
             val accountService: AccountService = json.toObject<AccountService>()
 
